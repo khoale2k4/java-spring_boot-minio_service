@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,7 +33,7 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             // Validate file
             if (file.isEmpty()) {
@@ -50,7 +51,7 @@ public class FileController {
 
             // Upload file
             String fileName = minioService.uploadFile(file);
-            
+
             response.put("success", true);
             response.put("message", "File uploaded successfully");
             response.put("fileName", fileName);
@@ -70,14 +71,28 @@ public class FileController {
     }
 
     /**
+     * Get files endpoint
+     */
+    @GetMapping("")
+    public ResponseEntity<List<String>> getFiles() {
+        try {
+            List<String> files = minioService.listAllFiles();
+            return ResponseEntity.ok(files);
+        } catch (Exception e) {
+            logger.error("Error downloading file: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
      * Download file endpoint
      */
     @GetMapping("/download/{fileName}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String fileName) {
         try {
-            InputStream inputStream = minioService.downloadFile(fileName);
-            StatObjectResponse fileInfo = minioService.getFileInfo(fileName);
-            
+            InputStream inputStream = minioService.downloadFile(fileName + ".jpg");
+            StatObjectResponse fileInfo = minioService.getFileInfo(fileName + ".jpg");
+
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
             headers.add(HttpHeaders.CONTENT_TYPE, fileInfo.contentType());
@@ -96,13 +111,13 @@ public class FileController {
     /**
      * Get file info endpoint
      */
-    @GetMapping("/info/{fileName}")
+    @GetMapping("{fileName}")
     public ResponseEntity<Map<String, Object>> getFileInfo(@PathVariable String fileName) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
-            StatObjectResponse fileInfo = minioService.getFileInfo(fileName);
-            
+            StatObjectResponse fileInfo = minioService.getFileInfo(fileName + ".jpg");
+
             response.put("success", true);
             response.put("fileName", fileName);
             response.put("size", fileInfo.size());
@@ -126,10 +141,10 @@ public class FileController {
     @DeleteMapping("/delete/{fileName}")
     public ResponseEntity<Map<String, Object>> deleteFile(@PathVariable String fileName) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             minioService.deleteFile(fileName);
-            
+
             response.put("success", true);
             response.put("message", "File deleted successfully");
             response.put("fileName", fileName);
