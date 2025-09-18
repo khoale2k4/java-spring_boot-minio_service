@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -86,6 +87,7 @@ public class MinioService {
      */
     public InputStream downloadFile(String fileName) throws Exception {
         try {
+            Thread.sleep(1000);
             return minioClient.getObject(
                     GetObjectArgs.builder()
                             .bucket(minioProperties.getBucketName())

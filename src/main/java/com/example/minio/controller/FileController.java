@@ -90,8 +90,8 @@ public class FileController {
     @GetMapping("/download/{fileName}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String fileName) {
         try {
-            InputStream inputStream = minioService.downloadFile(fileName + ".jpg");
-            StatObjectResponse fileInfo = minioService.getFileInfo(fileName + ".jpg");
+            InputStream inputStream = minioService.downloadFile(fileName);
+            StatObjectResponse fileInfo = minioService.getFileInfo(fileName);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
@@ -116,7 +116,7 @@ public class FileController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            StatObjectResponse fileInfo = minioService.getFileInfo(fileName + ".jpg");
+            StatObjectResponse fileInfo = minioService.getFileInfo(fileName);
 
             response.put("success", true);
             response.put("fileName", fileName);
