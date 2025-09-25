@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.example.minio.entity.ChatMessage;
 import com.example.minio.entity.Conversation;
 
+import java.lang.Thread;
 import java.util.*;
 
 @Service
@@ -28,8 +29,13 @@ public class ChatService {
     }
 
     public void addMessage(String conversationId, ChatMessage message) {
-        Conversation c = getOrCreateConversation(conversationId);
-        c.getMessages().add(message);
+        
+        try {
+            Thread.sleep(1000);
+            Conversation c = getOrCreateConversation(conversationId);
+            c.getMessages().add(message);
+        } catch (Exception e) {
+        }
     }
 
     public List<ChatMessage> getMessages(String conversationId) {
