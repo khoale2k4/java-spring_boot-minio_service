@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.minio.entity.ChatMessage;
 import com.example.minio.service.ChatService;
+import com.example.minio.entity.Conversation;
 
 import io.minio.StatObjectResponse;
 
@@ -50,6 +51,15 @@ public class ChatController {
                 message);
     }
 
+    @GetMapping("/getCons")
+    public ResponseEntity<Map<String, Object>> getCons() {
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Conversation> res = chatService.getCons();
+        response.put("data", res);
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{conId}")
     public ResponseEntity<Map<String, Object>> getMessages(@PathVariable String conId) {
         Map<String, Object> response = new HashMap<>();
@@ -59,6 +69,25 @@ public class ChatController {
 
             response.put("success", true);
             response.put("data", messages);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Conversation not found: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{userId_1}/{userId_2}")
+    public ResponseEntity<Map<String, Object>> getId(@PathVariable String userId_1, @PathVariable String userId_2) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String id = chatService.getConversationByParticipants(userId_1, userId_2);
+
+            response.put("success", true);
+            response.put("data", id);
 
             return ResponseEntity.ok(response);
 
