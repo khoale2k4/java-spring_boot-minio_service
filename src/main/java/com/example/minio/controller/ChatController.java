@@ -82,12 +82,15 @@ public class ChatController {
     @GetMapping("/{userId_1}/{userId_2}")
     public ResponseEntity<Map<String, Object>> getId(@PathVariable String userId_1, @PathVariable String userId_2) {
         Map<String, Object> response = new HashMap<>();
-
+        
         try {
-            String id = chatService.getConversationByParticipants(userId_1, userId_2);
+            String conId = chatService.getConversationByParticipants(userId_1, userId_2);
+            List<ChatMessage> messages = chatService.getMessages(conId);
+            
 
             response.put("success", true);
-            response.put("data", id);
+            response.put("data", conId);
+            response.put("messages", messages);
 
             return ResponseEntity.ok(response);
 
